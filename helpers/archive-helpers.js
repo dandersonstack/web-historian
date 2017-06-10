@@ -1,8 +1,10 @@
 var fs = require('fs');
 var path = require('path');
 var _ = require('underscore');
+var request = require('request');
 var http = require('http');
-
+var https = require('https');
+var urlModule = require('url');
 /*
  * You will need to reuse the same paths many times over in the course of this sprint.
  * Consider using the `paths` object below to store frequently used file paths. This way,
@@ -44,7 +46,6 @@ exports.isUrlInList = function(url, callback) {
   exports.readListOfUrls((dataArr) => {
     callback(_.contains(dataArr, url));
   });
-  //callback(exports.readListOfUrls());
 };
 
 exports.addUrlToList = function(url, callback) {
@@ -74,26 +75,58 @@ exports.isUrlArchived = function(url, callback) {
   }
 };
 
+var requestHelper = function(url) {
+  request(url, function (error, response, body) {
+    if (error) {
+      console.log('error:', error); // Print the error if one occurred 
+    } else { 
+      var directoryPath = exports.paths.archivedSites + '/' + urlModule.parse(url).host;        
+      fs.writeFile(directoryPath, body, (err)=>{
+        if (err) {
+          console.log(directoryPath, ': Issue writing the file');
+        }
+      });
+    }
+  });
+};
+
 exports.downloadUrls = function(urls) {
   urls.forEach((url)=> {
-    const req = http.get('http://' + urls[0], (res) => {
-      res.setEncoding('utf8');
-      data = [];
-      res.on('data', (chunk) => {
-        data += chunk;
-      });
-      res.on('end', () => {
-        var directoryPath = exports.paths.archivedSites + '/' + url;        
-        fs.writeFile(directoryPath, data, (err)=>{
-          if (err) {
-            console.log(directoryPath, ': Issue writing the file');
-          }
-        });
-      });
-    });
+    requestHelper('https://' + url);
   });
-
 };
+
+// var responseHelper = function(res) {
+//   res.setEncoding('utf8');
+//   data = [];
+//   if (res.statusCode >= 300 && res.statusCode < 400 /*&& res.headers.location.substring(0,)*/) {
+//     console.log(res.statusCode);
+//     console.log(res.headers.location);
+//     requestHelper(res.headers.location);
+//   } else {
+//     res.on('data', (chunk) => {
+//       data += chunk;
+//     });
+//     res.on('end', () => {
+//       console.log(res.headers.location);
+//       var directoryPath = exports.paths.archivedSites + '/' + url;        
+//       fs.writeFile(directoryPath, data, (err)=>{
+//         if (err) {
+//           console.log(directoryPath, ': Issue writing the file');
+//         }
+//       });
+//     });
+//   }
+// };
+
+// var requestHelper = function(url) {
+//   //logic to check if http or https in url
+//   const req = https.get(url, (res) => {
+//     responseHelper(res);
+//   });
+// };
+
+
 
 
 

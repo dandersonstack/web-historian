@@ -7,7 +7,6 @@ let archive = require('../helpers/archive-helpers');
 
 
 archive.readListOfUrls((urlArray)=> {
-  console.log(urlArray);
   var counter = 0;
   var urlsToBeArchived = [];
   _.each(urlArray, (url, index, urlArray)=> {
@@ -17,7 +16,6 @@ archive.readListOfUrls((urlArray)=> {
       }
       counter++;
       if (counter === urlArray.length) {
-        console.log(urlsToBeArchived);
         archive.downloadUrls(urlsToBeArchived);
       }
     });
