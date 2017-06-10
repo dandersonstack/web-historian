@@ -30,22 +30,15 @@ exports.handleRequest = function (req, res) {
       formData = (queryString.parse(chunk.toString())).url;
     });
     req.on('end', ()=> {
-      archive.isUrlArchived(formData, (archived) => {
-        if (archived) {
-          console.log('Running archived are you sure??');
-          res.writeHead(302, {
-            'Location': archive.paths.archivedSites + '/' + urlPath,
-            //add other headers here...
-          });
-          res.end();
-        } else {
-          archive.addUrlToList(formData, () => {
-            console.log('redirecting...');
+      archive.addUrlToList(formData, () => {
+        archive.isUrlArchived(formData, (archived) => {
+          if (archived) {
+            httpHelpers.redirects(res, formData);
+          } else {
+            console.log('redirecting to loading page...');
             httpHelpers.redirects(res, '/loading.html');
-            console.log('Sending the url to the list', formData);
-            
-          });
-        }
+          }
+        });
       });
     });
   }

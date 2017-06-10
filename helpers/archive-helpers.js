@@ -32,7 +32,10 @@ exports.readListOfUrls = function(callback) {
       console.log('This is an error');
     } else {
       let dataArr = data.toString().split('\n');
-      callback(dataArr);
+      
+      callback(_.reject(dataArr, (url) => {
+        return (url === '' || url === '/');
+      }));
     }
   });
 };
@@ -47,7 +50,7 @@ exports.isUrlInList = function(url, callback) {
 exports.addUrlToList = function(url, callback) {
   exports.isUrlInList(url, (exists) => {
     if (!exists) {
-      fs.appendFile(exports.paths.list, url, function (err) {
+      fs.appendFile(exports.paths.list, url + '\n', function (err) {
         callback();
       });
     } else {
@@ -80,15 +83,12 @@ exports.downloadUrls = function(urls) {
         data += chunk;
       });
       res.on('end', () => {
-        //write data to a new file
         var directoryPath = exports.paths.archivedSites + '/' + url;        
         fs.writeFile(directoryPath, data, (err)=>{
           if (err) {
             console.log(directoryPath, ': Issue writing the file');
           }
         });
-                    
-        //save that file in achieved sites
       });
     });
   });

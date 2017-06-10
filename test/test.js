@@ -65,10 +65,10 @@ describe('server', function() {
           .send({ url: url })
           .expect(302, function (err) {
             if (!err) {
+              console.log("This is an issue, because if the file is already achrived we have a problem!");
               var fileContents = fs.readFileSync(archive.paths.list, 'utf8');
               expect(fileContents).to.equal(url + '\n');
             }
-
             done(err);
           });
       });
