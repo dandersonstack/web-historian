@@ -39,11 +39,28 @@ exports.serveAssets = function(res, asset, callback) {
   // (Static files are things like html (yours or archived from others...),
   // css, or anything that doesn't change often.)
   // defaultPaths(res);
+  asset = archive.paths.archivedSites + '/' + asset;
+  console.log("the url path is:", asset);  
+  fs.exists(asset, function(doesExist) {
+    if (!doesExist) {
+      res.statusCode = 404;
+      res.end(`Resource not found "${asset}"`);
+    } else {
+      fs.readFile(asset, (err, data) => {
+        if (err) {
+          res.statusCode = 500;
+          res.end(`Server error: "${err}"`);
+        } else {
+          res.end(data);
+        }
+      });
+    }
+  });
 
 };
 
 exports.redirects = function(res, url) {
-  res.writeHead(301, {
+  res.writeHead(302, {
     'Location': url,
   });
   res.end();

@@ -13,8 +13,7 @@ exports.handleRequest = function (req, res) {
   if (req.method === 'GET') {
     archive.isUrlArchived(urlPath, (success)=> {
       if (success) {
-        //console.log("the url has be archived");
-        // console.log(urlPath);
+        console.log("About to retrieve the archived site:", urlPath);
         httpHelpers.serveAssets(res, urlPath, ()=>{
           console.log('Put some callback here');
         }); 

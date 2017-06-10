@@ -85,9 +85,6 @@ exports.downloadUrls = function(urls) {
         fs.writeFile(directoryPath, data, (err)=>{
           if (err) {
             console.log(directoryPath, ': Issue writing the file');
-          } else {
-
-            console.log('Succesfully added the new file', directoryPath);
           }
         });
                     
