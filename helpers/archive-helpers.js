@@ -48,24 +48,27 @@ exports.addUrlToList = function(url, callback) {
   exports.isUrlInList(url, (exists) => {
     if (!exists) {
       fs.appendFile(exports.paths.list, url, function (err) {
-        if (err) { 
-          throw err; 
-        }
         callback();
       });
+    } else {
+      callback();
     }
   });
 };
 
 exports.isUrlArchived = function(url, callback) {
   let urlPath = exports.paths.archivedSites + '/' + url;
-  fs.stat(urlPath, (err, fileInfo) => {
-    if (err) {
-      callback(false);
-    } else {
-      callback(true);
-    }
-  });
+  if (url === '' || url === '/') {
+    callback(false);
+  } else {
+    fs.stat(urlPath, (err, fileInfo) => {
+      if (err) {
+        callback(false);
+      } else {
+        callback(true);
+      }
+    });
+  }
 };
 
 exports.downloadUrls = function(urls) {
@@ -78,23 +81,16 @@ exports.downloadUrls = function(urls) {
       });
       res.on('end', () => {
         //write data to a new file
-        var directoryPath = exports.paths.archivedSites + '/' + url;
-        fs.mkdir(directoryPath, (err)=> {
+        var directoryPath = exports.paths.archivedSites + '/' + url;        
+        fs.writeFile(directoryPath, data, (err)=>{
           if (err) {
-            console.log('Issue writing the new directory: ', directoryPath);
+            console.log(directoryPath, ': Issue writing the file');
           } else {
-            fs.writeFile(directoryPath + '/index.html', data, (err)=>{
-              if (err) {
-                console.log(directoryPath, ': Issue writing the index.html file');
-              } else {
-                console.log(directoryPath + '/index.html');
-                console.log('Recursively go through the file and grab all the assets');
-              }
-            });
-          }
-                    
-        });
 
+            console.log('Succesfully added the new file', directoryPath);
+          }
+        });
+                    
         //save that file in achieved sites
       });
     });

@@ -42,6 +42,12 @@ exports.serveAssets = function(res, asset, callback) {
 
 };
 
+exports.redirects = function(res, url) {
+  res.writeHead(301, {
+    'Location': url,
+  });
+  res.end();
+};
 
 
 
